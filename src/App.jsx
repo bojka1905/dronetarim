@@ -10,7 +10,6 @@ import CalendarPage from './pages/CalendarPage'
 import Payments from './pages/Payments'
 import Kasa from './pages/Kasa'
 import Stok from './pages/Stok'
-import Fiyatlar from './pages/Fiyatlar'
 import Settings from './pages/Settings'
 import PinScreen, { isPinRequired } from './components/PinScreen'
 
@@ -34,7 +33,6 @@ export default function App() {
           <Route path="/odemeler"   element={<Payments />} />
           <Route path="/kasa"       element={<Kasa />} />
           <Route path="/stok"       element={<Stok />} />
-          <Route path="/fiyatlar"   element={<Fiyatlar />} />
           <Route path="/ayarlar"    element={<Settings />} />
         </Routes>
       </Layout>

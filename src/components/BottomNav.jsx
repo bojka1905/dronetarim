@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { Users, Briefcase, Calendar, CreditCard, LayoutDashboard, Settings, Wallet, Package, Tag } from 'lucide-react'
+import { Users, Briefcase, Calendar, CreditCard, LayoutDashboard, Settings, Wallet, Package } from 'lucide-react'
 
 const navItems = [
   { to: '/',           icon: LayoutDashboard, label: 'Ana Sayfa' },
@@ -7,7 +7,6 @@ const navItems = [
   { to: '/isler',      icon: Briefcase,       label: 'İşler' },
   { to: '/takvim',     icon: Calendar,        label: 'Takvim' },
   { to: '/stok',       icon: Package,         label: 'Stok' },
-  { to: '/fiyatlar',   icon: Tag,             label: 'Fiyatlar' },
   { to: '/odemeler',   icon: CreditCard,      label: 'Ödeme' },
   { to: '/kasa',       icon: Wallet,          label: 'Kasa' },
   { to: '/ayarlar',    icon: Settings,        label: 'Ayarlar' },
