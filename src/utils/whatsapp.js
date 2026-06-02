@@ -10,7 +10,7 @@ export function generateJobSummary(job, customer, totalPaid = 0) {
     ? `◑ Kısmi — Alınan: ${formatCurrency(totalPaid)} / Kalan: ${formatCurrency(kalan)}`
     : `⏳ Bekliyor (${formatCurrency(tutar)})`
 
-  const text = `🚁 *TarımJet - İŞ BİLGİSİ*
+  const text = `🚁 *DroneTarım - İŞ BİLGİSİ*
 
 👤 *Müşteri:* ${customer.ad}
 📍 *Tarla:* ${job.tarlaAdi}
@@ -21,7 +21,7 @@ ${{ tohumlama: '🌱 *Tohum Türü:*', ilac: '🌿 *İlaç Adı:*', gubreleme: '
 📊 *Durum:* ${durum}
 💰 *Ödeme:* ${odeme}
 ${job.notlar ? `\n📝 *Not:* ${job.notlar}` : ''}
-_TarımJet - Drone İlaçlama Yönetim_`
+_DroneTarım - Drone İlaçlama Yönetim_`
 
   return text.trim()
 }
@@ -30,7 +30,7 @@ export function generateCustomerSummary(customer, jobs, financials) {
   const IS_TIPI_LABEL = { tohumlama: '🌱 Tohumlama', ilac: '🌿 İlaçlama', gubreleme: '🌾 Gübreleme' }
   const DURUM_ICON = { tamamlandi: '✅', devamediyor: '⏳', planli: '📅' }
 
-  let text = `🚁 *TarımJet - MÜŞTERİ ÖZETİ*\n\n`
+  let text = `🚁 *DroneTarım - MÜŞTERİ ÖZETİ*\n\n`
   text += `👤 *${customer.ad}*`
   if (customer.telefon) text += `\n📞 ${customer.telefon}`
   if (customer.il) text += `\n📍 ${customer.il}${customer.ilce ? ` / ${customer.ilce}` : ''}`
@@ -50,7 +50,7 @@ export function generateCustomerSummary(customer, jobs, financials) {
   text += `\nToplam Alacak: ${formatCurrency(financials.totalAlacak)}`
   text += `\nTahsil Edilen: ${formatCurrency(financials.totalTahsil)}`
   text += `\nKalan Borç: ${formatCurrency(financials.kalan)}`
-  text += '\n\n_TarımJet - Drone İlaçlama Yönetim_'
+  text += '\n\n_DroneTarım - Drone İlaçlama Yönetim_'
   return text.trim()
 }
 

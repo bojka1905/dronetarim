@@ -257,7 +257,7 @@ export default function Settings() {
 
       {/* Uygulama bilgisi */}
       <div className="text-center text-xs text-gray-400 pt-2">
-        <p className="font-medium">TarımJet v1.0</p>
+        <p className="font-medium">DroneTarım v1.0</p>
         <p className="mt-0.5">Drone İlaçlama Yönetim Sistemi</p>
       </div>
 

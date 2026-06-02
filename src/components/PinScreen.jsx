@@ -102,8 +102,8 @@ export default function PinScreen({ onUnlock }) {
   return (
     <div className="fixed inset-0 bg-gray-950 flex flex-col items-center justify-center px-8 select-none z-[100]">
       {/* Logo + başlık */}
-      <img src="/icon-192x192.png" alt="TarımJet" className="w-16 h-16 rounded-2xl mb-3 shadow-lg" />
-      <h1 className="text-white text-xl font-bold mb-1">TarımJet</h1>
+      <img src="/icon-192x192.png" alt="DroneTarım" className="w-16 h-16 rounded-2xl mb-3 shadow-lg" />
+      <h1 className="text-white text-xl font-bold mb-1">DroneTarım</h1>
       <p className="text-gray-400 text-sm mb-10">PIN kodunuzu girin</p>
 
       {/* Nokta göstergesi */}

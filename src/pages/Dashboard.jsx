@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { customerStore, jobStore } from '../utils/store'
-import { Users, Briefcase, CreditCard, TrendingUp, Plus, ChevronRight } from 'lucide-react'
+import { customerStore, jobStore, stockStore } from '../utils/store'
+import { Users, Briefcase, CreditCard, TrendingUp, Plus, ChevronRight, AlertTriangle } from 'lucide-react'
 
 const STATUS_LABEL = {
   planli: { label: 'Planlandı', cls: 'bg-blue-100 text-blue-700' },
@@ -24,7 +24,8 @@ export default function Dashboard() {
     const d = new Date()
     const todayStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
     const todayJobs = jobs.filter(j => j.tarih === todayStr)
-    return { customers: customers.length, jobCount: jobs.length, totalRevenue, pendingRevenue, todayJobs, jobs }
+    const criticalStock = stockStore.getCritical()
+    return { customers: customers.length, jobCount: jobs.length, totalRevenue, pendingRevenue, todayJobs, jobs, criticalStock }
   }, [])
 
   const recentJobs = useMemo(() => {
@@ -38,11 +39,28 @@ export default function Dashboard() {
       {/* Header */}
       <div className="flex items-center justify-between pt-2">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">TarımJet</h1>
+          <h1 className="text-xl font-bold text-gray-900">DroneTarım</h1>
           <p className="text-sm text-gray-500">{new Date().toLocaleDateString('tr-TR', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
         </div>
-        <img src="/icon-192x192.png" alt="TarımJet" className="w-10 h-10 rounded-xl object-cover" />
+        <img src="/icon-192x192.png" alt="DroneTarım" className="w-10 h-10 rounded-xl object-cover" />
       </div>
+
+      {/* Kritik stok uyarısı */}
+      {stats.criticalStock.length > 0 && (
+        <button onClick={() => navigate('/stok')}
+          className="w-full bg-red-50 border border-red-200 rounded-xl p-3 flex items-center gap-3 text-left active:bg-red-100">
+          <div className="w-9 h-9 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
+            <AlertTriangle size={18} className="text-red-600" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-red-700">Kritik Stok Uyarısı</p>
+            <p className="text-xs text-red-500 truncate">
+              {stats.criticalStock.map(s => s.ad).join(', ')}
+            </p>
+          </div>
+          <ChevronRight size={16} className="text-red-400 flex-shrink-0" />
+        </button>
+      )}
 
       {/* Stats grid */}
       <div className="grid grid-cols-2 gap-3">

@@ -5,6 +5,7 @@ export const KEYS = {
   JOBS:      'drone_jobs',
   PAYMENTS:  'drone_payments',
   EXPENSES:  'drone_expenses',
+  STOCK:     'drone_stock',
 }
 
 export function getAll(key) {
@@ -116,4 +117,31 @@ export function deriveOdemeDurumu(tutar, totalPaid) {
   if (a <= 0) return 'bekliyor'
   if (t > 0 && a >= t) return 'odendi'
   return 'kismi'
+}
+
+// Stok işlemleri
+export const stockStore = {
+  getAll: () => getAll(KEYS.STOCK),
+  getById: (id) => getAll(KEYS.STOCK).find(s => s.id === id),
+  add: (item) => {
+    const all = getAll(KEYS.STOCK)
+    const newItem = { ...item, id: generateId(), createdAt: new Date().toISOString() }
+    save(KEYS.STOCK, [...all, newItem])
+    return newItem
+  },
+  update: (id, updates) => {
+    const all = getAll(KEYS.STOCK)
+    save(KEYS.STOCK, all.map(s => s.id === id ? { ...s, ...updates } : s))
+  },
+  delete: (id) => {
+    save(KEYS.STOCK, getAll(KEYS.STOCK).filter(s => s.id !== id))
+  },
+  adjust: (id, delta) => {
+    if (!id || !delta) return
+    const all = getAll(KEYS.STOCK)
+    save(KEYS.STOCK, all.map(s =>
+      s.id === id ? { ...s, miktar: Math.max(0, (Number(s.miktar) || 0) + Number(delta)) } : s
+    ))
+  },
+  getCritical: () => getAll(KEYS.STOCK).filter(s => Number(s.miktar) <= Number(s.minStok)),
 }
