@@ -6,6 +6,7 @@ export const KEYS = {
   PAYMENTS:  'drone_payments',
   EXPENSES:  'drone_expenses',
   STOCK:     'drone_stock',
+  FIYATLAR:  'drone_fiyatlar',
 }
 
 export function getAll(key) {
@@ -144,4 +145,23 @@ export const stockStore = {
     ))
   },
   getCritical: () => getAll(KEYS.STOCK).filter(s => Number(s.miktar) <= Number(s.minStok)),
+}
+
+// Fiyat (alış/satış) işlemleri
+export const fiyatStore = {
+  getAll:   () => getAll(KEYS.FIYATLAR),
+  getById:  (id) => getAll(KEYS.FIYATLAR).find(f => f.id === id),
+  add: (item) => {
+    const all     = getAll(KEYS.FIYATLAR)
+    const newItem = { ...item, id: generateId(), createdAt: new Date().toISOString() }
+    save(KEYS.FIYATLAR, [...all, newItem])
+    return newItem
+  },
+  update: (id, updates) => {
+    const all = getAll(KEYS.FIYATLAR)
+    save(KEYS.FIYATLAR, all.map(f => f.id === id ? { ...f, ...updates } : f))
+  },
+  delete: (id) => {
+    save(KEYS.FIYATLAR, getAll(KEYS.FIYATLAR).filter(f => f.id !== id))
+  },
 }
