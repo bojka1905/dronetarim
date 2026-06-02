@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { jobStore, customerStore, paymentStore, stockStore, getEffectivePaid, deriveOdemeDurumu } from '../utils/store'
+import { jobStore, customerStore, paymentStore, getEffectivePaid, deriveOdemeDurumu } from '../utils/store'
 import { generateJobSummary, openWhatsApp } from '../utils/whatsapp'
 import { Plus, Search, X, Trash2, MessageCircle, Send, ChevronDown, UserPlus, Users } from 'lucide-react'
 
@@ -11,13 +11,10 @@ function localDateStr(date = new Date()) {
   return `${y}-${m}-${d}`
 }
 
-const IS_TIPI_TO_STOK_KAT = { ilac: 'ilac', gubreleme: 'gubre', tohumlama: 'tohum' }
-
 const EMPTY_FORM = {
   musteriId: '', tarlaAdi: '', dekar: '', ilac: '', doz: '',
   tarih: localDateStr(), saat: '',
   isTipi: 'ilac', durum: 'planli', tutar: '', odemeDurumu: 'bekliyor', notlar: '',
-  stokId: '', kullanilanMiktar: '',
 }
 
 const IS_TIPI_OPTIONS = [
@@ -97,9 +94,6 @@ export default function Jobs() {
   // Toplu WhatsApp state'leri
   const [showBulkWA, setShowBulkWA] = useState(false)
   const [bulkDate, setBulkDate] = useState(() => localDateStr())
-  // Stok state
-  const [stocks, setStocks] = useState(() => stockStore.getAll())
-
   const todayStr    = localDateStr()
   const tomorrowStr = (() => { const d = new Date(); d.setDate(d.getDate() + 1); return localDateStr(d) })()
 
@@ -168,7 +162,6 @@ export default function Jobs() {
     setJobs(jobStore.getAll())
     setCustomers(customerStore.getAll())
     setAllPayments(paymentStore.getAll())
-    setStocks(stockStore.getAll())
   }
 
   const openAdd = () => {
@@ -212,27 +205,14 @@ export default function Jobs() {
     const { alinanOdeme: _removed, ...cleanForm } = form
     const jobData = { ...cleanForm, musteriId, odemeDurumu }
 
-    if (modal === 'add') {
-      jobStore.add(jobData)
-      if (form.stokId && Number(form.kullanilanMiktar) > 0)
-        stockStore.adjust(form.stokId, -Number(form.kullanilanMiktar))
-    } else {
-      // Eski stok düşümünü geri al, yenisini uygula
-      if (modal.stokId && Number(modal.kullanilanMiktar) > 0)
-        stockStore.adjust(modal.stokId, Number(modal.kullanilanMiktar))
-      jobStore.update(modal.id, jobData)
-      if (form.stokId && Number(form.kullanilanMiktar) > 0)
-        stockStore.adjust(form.stokId, -Number(form.kullanilanMiktar))
-    }
+    if (modal === 'add') jobStore.add(jobData)
+    else jobStore.update(modal.id, jobData)
     refresh()
     setModal(null)
   }
 
   const handleDelete = (id) => {
     if (!confirm('Bu işi ve tüm ödeme kayıtlarını silmek istiyor musunuz?')) return
-    const job = jobStore.getById(id)
-    if (job?.stokId && Number(job.kullanilanMiktar) > 0)
-      stockStore.adjust(job.stokId, Number(job.kullanilanMiktar))
     paymentStore.deleteByJob(id)
     jobStore.delete(id)
     refresh()
@@ -539,33 +519,6 @@ export default function Jobs() {
                   <Field label={f.ilacLabel} value={form.ilac} onChange={v => setField('ilac', v)} placeholder={f.ilacPlaceholder} />
                   <Field label={f.dozLabel}  value={form.doz}  onChange={v => setField('doz', v)}  placeholder={f.dozPlaceholder} />
                 </>
-              })()}
-
-              {/* Stok Düşümü */}
-              {(() => {
-                const kat = IS_TIPI_TO_STOK_KAT[form.isTipi]
-                const ilgiliStoklar = stocks.filter(s => s.kategori === kat)
-                if (ilgiliStoklar.length === 0) return null
-                return (
-                  <div className="bg-gray-50 rounded-xl border border-dashed border-gray-200 p-3 space-y-2">
-                    <p className="text-xs font-semibold text-gray-500">Stok Düşümü (opsiyonel)</p>
-                    <div className="relative">
-                      <select value={form.stokId || ''} onChange={e => setField('stokId', e.target.value)}
-                        className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm outline-none focus:border-primary-500 appearance-none bg-white pr-8">
-                        <option value="">Stok seçilmedi</option>
-                        {ilgiliStoklar.map(s => (
-                          <option key={s.id} value={s.id}>{s.ad} (mevcut: {s.miktar} {s.birim})</option>
-                        ))}
-                      </select>
-                      <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-                    </div>
-                    {form.stokId && (
-                      <Field label={`Kullanılan Miktar (${stocks.find(s => s.id === form.stokId)?.birim || ''})`}
-                        value={form.kullanilanMiktar || ''} onChange={v => setField('kullanilanMiktar', v)}
-                        placeholder="10" type="number" />
-                    )}
-                  </div>
-                )
               })()}
 
               <div>

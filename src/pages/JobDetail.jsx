@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { jobStore, customerStore, paymentStore, stockStore, getEffectivePaid, deriveOdemeDurumu } from '../utils/store'
+import { jobStore, customerStore, paymentStore, getEffectivePaid, deriveOdemeDurumu } from '../utils/store'
 import { ArrowLeft, Edit2, Trash2, Phone, MapPin, X, Plus, MessageCircle } from 'lucide-react'
 import { generateJobSummary, openWhatsApp } from '../utils/whatsapp'
 
@@ -68,7 +68,6 @@ export default function JobDetail() {
   const [jobPayments, setJobPayments] = useState(() => paymentStore.getByJob(id))
   const [showPaymentForm, setShowPaymentForm] = useState(false)
   const [newPayment, setNewPayment] = useState(EMPTY_PAYMENT)
-  const [stocks, setStocks] = useState(() => stockStore.getAll())
 
   const customer = useMemo(() => job ? customerStore.getById(job.musteriId) : null, [job])
 
@@ -99,30 +98,21 @@ export default function JobDetail() {
     setJob(updated)
     setAllPayments(paymentStore.getAll())
     setJobPayments(paymentStore.getByJob(id))
-    setStocks(stockStore.getAll())
     if (updated) setForm(updated)
   }
 
   const handleSave = () => {
     if (!form.tarlaAdi) return
-    // Eski stok düşümünü geri al
-    if (job.stokId && Number(job.kullanilanMiktar) > 0)
-      stockStore.adjust(job.stokId, Number(job.kullanilanMiktar))
     const totalPaidNow = paymentTotals[id] || 0
     const odemeDurumu = deriveOdemeDurumu(form.tutar, totalPaidNow)
     const { alinanOdeme: _removed, ...cleanForm } = form
     jobStore.update(id, { ...cleanForm, odemeDurumu })
-    // Yeni stok düşümü uygula
-    if (form.stokId && Number(form.kullanilanMiktar) > 0)
-      stockStore.adjust(form.stokId, -Number(form.kullanilanMiktar))
     refresh()
     setShowEdit(false)
   }
 
   const handleDelete = () => {
     if (!confirm('Bu işi ve tüm ödeme kayıtlarını silmek istediğinize emin misiniz?')) return
-    if (job.stokId && Number(job.kullanilanMiktar) > 0)
-      stockStore.adjust(job.stokId, Number(job.kullanilanMiktar))
     paymentStore.deleteByJob(id)
     jobStore.delete(id)
     navigate(-1)
@@ -339,29 +329,9 @@ export default function JobDetail() {
               </div>
               {(() => {
                 const f = IS_TIPI_FIELDS[form.isTipi] || IS_TIPI_FIELDS.ilac
-                const IS_TIPI_TO_STOK_KAT = { ilac: 'ilac', gubreleme: 'gubre', tohumlama: 'tohum' }
-                const kat = IS_TIPI_TO_STOK_KAT[form.isTipi]
-                const ilgiliStoklar = stocks.filter(s => s.kategori === kat)
                 return <>
                   <Field label={f.ilacLabel} value={form.ilac} onChange={v => setField('ilac', v)} placeholder={f.ilacPlaceholder} />
                   <Field label={f.dozLabel}  value={form.doz}  onChange={v => setField('doz', v)}  placeholder={f.dozPlaceholder} />
-                  {ilgiliStoklar.length > 0 && (
-                    <div className="bg-gray-50 rounded-xl border border-dashed border-gray-200 p-3 space-y-2">
-                      <p className="text-xs font-semibold text-gray-500">Stok Düşümü (opsiyonel)</p>
-                      <select value={form.stokId || ''} onChange={e => setField('stokId', e.target.value)}
-                        className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm outline-none focus:border-primary-500 bg-white">
-                        <option value="">Stok seçilmedi</option>
-                        {ilgiliStoklar.map(s => (
-                          <option key={s.id} value={s.id}>{s.ad} (mevcut: {s.miktar} {s.birim})</option>
-                        ))}
-                      </select>
-                      {form.stokId && (
-                        <Field label={`Kullanılan Miktar (${stocks.find(s => s.id === form.stokId)?.birim || ''})`}
-                          value={form.kullanilanMiktar || ''} onChange={v => setField('kullanilanMiktar', v)}
-                          placeholder="10" type="number" />
-                      )}
-                    </div>
-                  )}
                 </>
               })()}
 
