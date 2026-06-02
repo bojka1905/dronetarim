@@ -1,5 +1,14 @@
 import { useState, useEffect } from 'react'
 import { Delete } from 'lucide-react'
+import { DroneIcon } from './DroneIcon'
+
+function DroneLogo() {
+  return (
+    <div className="w-20 h-20 bg-primary-600 rounded-2xl flex items-center justify-center mb-4 shadow-xl">
+      <DroneIcon size={52} className="text-white" />
+    </div>
+  )
+}
 
 const PIN_KEY       = 'tj_pin'
 const AUTH_DATE_KEY = 'tj_auth_date'
@@ -102,7 +111,7 @@ export default function PinScreen({ onUnlock }) {
   return (
     <div className="fixed inset-0 bg-gray-950 flex flex-col items-center justify-center px-8 select-none z-[100]">
       {/* Logo + başlık */}
-      <img src="/icon-192x192.png" alt="DroneTarım" className="w-16 h-16 rounded-2xl mb-3 shadow-lg" />
+      <DroneLogo />
       <h1 className="text-white text-xl font-bold mb-1">DroneTarım</h1>
       <p className="text-gray-400 text-sm mb-10">PIN kodunuzu girin</p>
 

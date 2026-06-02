@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { customerStore, jobStore, stockStore } from '../utils/store'
 import { Users, Briefcase, CreditCard, TrendingUp, Plus, ChevronRight, AlertTriangle } from 'lucide-react'
+import { DroneIcon } from '../components/DroneIcon'
 
 const STATUS_LABEL = {
   planli: { label: 'Planlandı', cls: 'bg-blue-100 text-blue-700' },
@@ -38,11 +39,15 @@ export default function Dashboard() {
     <div className="p-4 space-y-5">
       {/* Header */}
       <div className="flex items-center justify-between pt-2">
-        <div>
-          <h1 className="text-xl font-bold text-gray-900">DroneTarım</h1>
-          <p className="text-sm text-gray-500">{new Date().toLocaleDateString('tr-TR', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
+        <div className="flex items-center gap-2.5">
+          <div className="w-10 h-10 bg-primary-600 rounded-xl flex items-center justify-center flex-shrink-0">
+            <DroneIcon size={26} className="text-white" />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-gray-900 leading-tight">DroneTarım</h1>
+            <p className="text-xs text-gray-500">{new Date().toLocaleDateString('tr-TR', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
+          </div>
         </div>
-        <img src="/icon-192x192.png" alt="DroneTarım" className="w-10 h-10 rounded-xl object-cover" />
       </div>
 
       {/* Kritik stok uyarısı */}
